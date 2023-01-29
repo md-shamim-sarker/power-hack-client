@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Modal from '../../components/Modal/Modal';
+import Modal from './Modal';
 import Pagination from './Pagination';
 
 const Billings = () => {
@@ -7,28 +7,32 @@ const Billings = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchResult, setSearchResult] = useState('');
     const billingsPerPage = 10;
-    const lastPostIndex = currentPage * billingsPerPage;
-    const firstPostIndex = lastPostIndex - billingsPerPage;
-    const currentPosts = billings.slice(firstPostIndex, lastPostIndex);
 
     useEffect(() => {
-        if(searchResult === '') {
-            fetch('http://localhost:5000/api/billing-list')
-                .then(response => response.json())
-                .then(json => setBillings(json))
-                .catch(error => console.log(error));
-        } else {
+        if(searchResult !== '') {
             fetch(`http://localhost:5000/api/search/${searchResult}`)
                 .then(response => response.json())
                 .then(json => setBillings(json))
                 .catch(error => console.log(error));
         }
-    }, [searchResult]);
+        if(searchResult === '') {
+            fetch('http://localhost:5000/api/billing-list')
+                .then(response => response.json())
+                .then(json => setBillings(json))
+                .catch(error => console.log(error));
+        }
+    }, [searchResult, billings]);
 
     function searchFunction(event) {
         const searchValue = event.target.value;
         setSearchResult(searchValue);
     }
+
+    const lastPostIndex = currentPage * billingsPerPage;
+    const firstPostIndex = lastPostIndex - billingsPerPage;
+    const currentPosts = billings.slice(firstPostIndex, lastPostIndex);
+
+    console.log(currentPosts);
 
     return (
         <div>
@@ -63,14 +67,16 @@ const Billings = () => {
                                     <td>{billing.email}</td>
                                     <td>{billing.phone}</td>
                                     <td>{billing.paid_amount}</td>
-                                    <td>Update | Delete</td>
+                                    <td>
+                                        <label htmlFor="new-bill" className='text-blue-800 underline'>Update</label> | Delete
+                                    </td>
                                 </tr>)
                         }
                     </tbody>
                 </table>
             </div>
 
-            <div className='flex justify-center gap-5 items-center mt-5'>
+            <div className='flex justify-center gap-5 items-center mt-5 px-3'>
                 <button onClick={() => setCurrentPage(currentPage > 2 ? currentPage - 1 : 1)} className="btn btn-primary btn-outline btn-sm">Previous</button>
                 <Pagination
                     totalBillings={billings.length}
@@ -80,17 +86,6 @@ const Billings = () => {
                 />
                 <button onClick={() => setCurrentPage(currentPage < billings.length / 10 ? currentPage + 1 : currentPage)} className="btn btn-primary btn-outline btn-sm">Next</button>
             </div>
-
-
-            {/* Add New Bill Modal */}
-            {/* <input type="checkbox" id="new-bill" className="modal-toggle" />
-            <div className="modal">
-                <div className="modal-box relative">
-                    <label htmlFor="new-bill" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-                    <h3 className="text-lg font-bold">Congratulations random Internet user!</h3>
-                    <p className="py-4">You've been selected for a chance to get one year of subscription to use Wikipedia for free!</p>
-                </div>
-            </div> */}
 
             <Modal></Modal>
 
