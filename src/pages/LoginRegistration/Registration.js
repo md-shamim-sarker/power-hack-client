@@ -15,7 +15,6 @@ const Registration = () => {
         }).catch(error => {
             console.error(error.message);
         });
-        // console.log(user);
     };
     return (
         <>

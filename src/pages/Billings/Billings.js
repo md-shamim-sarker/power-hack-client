@@ -1,12 +1,16 @@
 import React, {useEffect, useState} from 'react';
+import Billing from './Billing';
 import Modal from './Modal';
 import Pagination from './Pagination';
 
 const Billings = () => {
     const [billings, setBillings] = useState([]);
+    const [totalBillings, setTotalBillings] = useState([]);
+    const [billing2, setBilling] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [searchResult, setSearchResult] = useState('');
     const billingsPerPage = 10;
+    const [render, setRender] = useState(false);
 
     useEffect(() => {
         if(searchResult !== '') {
@@ -15,13 +19,17 @@ const Billings = () => {
                 .then(json => setBillings(json))
                 .catch(error => console.log(error));
         }
+
         if(searchResult === '') {
             fetch('http://localhost:5000/api/billing-list')
                 .then(response => response.json())
-                .then(json => setBillings(json))
+                .then(json => {
+                    setBillings(json);
+                    setTotalBillings(json);
+                })
                 .catch(error => console.log(error));
         }
-    }, [searchResult, billings]);
+    }, [searchResult, render]);
 
     function searchFunction(event) {
         const searchValue = event.target.value;
@@ -32,7 +40,44 @@ const Billings = () => {
     const firstPostIndex = lastPostIndex - billingsPerPage;
     const currentPosts = billings.slice(firstPostIndex, lastPostIndex);
 
-    console.log(currentPosts);
+    const onSubmitHandler = event => {
+        event.preventDefault();
+        const form = event.target;
+        const full_name = form.full_name.value;
+        const email = form.email.value;
+        const phone = form.phone.value;
+        const paid_amount = form.payable_amount.value;
+        const billing = {full_name, email, phone, paid_amount};
+
+        fetch(`http://localhost:5000/api/update-billing/${billing2._id}`, {
+            method: 'PUT',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify(billing)
+        }).then((result) => {
+            console.log(result);
+            setRender(!render);
+        }).catch(err => console.log(err));
+    };
+
+    const handleDelete = (deleteBilling) => {
+        fetch(`http://localhost:5000/api/delete-billing/${deleteBilling._id}`, {
+            method: 'DELETE'
+        })
+            .then(result => {
+                console.log(result);
+                setRender(!render);
+            })
+            .then((err) => console.log(err));
+    };
+
+
+    let totalArr = [];
+    let sum = 0;
+    totalBillings.map(billing => totalArr.push(Number(billing.paid_amount)));
+    for(let index = 0; index < totalArr.length; index++) {
+        sum += totalArr[index];
+    }
+
 
     return (
         <div>
@@ -42,7 +87,7 @@ const Billings = () => {
                     <input onKeyUp={searchFunction} type="search" placeholder="Search" className="input input-bordered input-sm" />
                 </div>
                 <div className='flex gap-3 items-center justify-between'>
-                    <p className='text-lg font-semibold'>Paid Total: 0</p>
+                    <p className='text-lg font-semibold'>Paid Total: {sum}</p>
                     <label htmlFor="new-bill" className='btn btn-primary btn-sm'>Add New Bill</label>
                 </div>
             </div>
@@ -60,17 +105,22 @@ const Billings = () => {
                     </thead>
                     <tbody>
                         {
-                            currentPosts.map(billing =>
-                                <tr className='hover cursor-pointer' key={billing.billing_id}>
-                                    <th>{billing.billing_id}</th>
-                                    <td>{billing.full_name}</td>
-                                    <td>{billing.email}</td>
-                                    <td>{billing.phone}</td>
-                                    <td>{billing.paid_amount}</td>
-                                    <td>
-                                        <label htmlFor="new-bill" className='text-blue-800 underline'>Update</label> | Delete
-                                    </td>
-                                </tr>)
+                            searchResult === '' &&
+                            currentPosts.map(billing => <Billing
+                                key={billing._id}
+                                billing={billing}
+                                setBilling={setBilling}
+                                handleDelete={handleDelete}
+                            ></Billing>)
+                        }
+                        {
+                            searchResult !== '' &&
+                            billings.map(billing => <Billing
+                                key={billing._id}
+                                billing={billing}
+                                setBilling={setBilling}
+                                handleDelete={handleDelete}
+                            ></Billing>)
                         }
                     </tbody>
                 </table>
@@ -86,10 +136,36 @@ const Billings = () => {
                 />
                 <button onClick={() => setCurrentPage(currentPage < billings.length / 10 ? currentPage + 1 : currentPage)} className="btn btn-primary btn-outline btn-sm">Next</button>
             </div>
+            <Modal
+                render={render}
+                setRender={setRender}
+            ></Modal>
 
-            <Modal></Modal>
+            <input type="checkbox" id="new-bill2" className="modal-toggle" />
+            <div className="modal">
+                <div className="modal-box relative">
+                    <h1 className="text-2xl text-center font-bold">Billing Information</h1>
+                    <label htmlFor="new-bill2" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
 
-
+                    <form onSubmit={onSubmitHandler} className="card-body">
+                        <div className="form-control">
+                            <input type="text" name="full_name" className="input input-bordered" defaultValue={billing2.full_name} />
+                        </div>
+                        <div className="form-control">
+                            <input type="email" name="email" className="input input-bordered" defaultValue={billing2.email} />
+                        </div>
+                        <div className="form-control">
+                            <input type="text" name="phone" className="input input-bordered" defaultValue={billing2.phone} />
+                        </div>
+                        <div className="form-control">
+                            <input type="text" name="payable_amount" className="input input-bordered" defaultValue={billing2.paid_amount} />
+                        </div>
+                        <div className="form-control mt-6">
+                            <button type='submit' className="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 };
