@@ -14,7 +14,7 @@ const Pagination = ({
     }
 
     return (
-        <div className='flex gap-3 justify-center mt-5'>
+        <div className='flex gap-3'>
             {pages.map((page, index) => {
                 return (
                     <button

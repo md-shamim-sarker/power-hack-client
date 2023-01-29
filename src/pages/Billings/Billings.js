@@ -5,25 +5,37 @@ import Pagination from './Pagination';
 const Billings = () => {
     const [billings, setBillings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [searchResult, setSearchResult] = useState('');
     const billingsPerPage = 10;
-
-    useEffect(() => {
-        fetch('./data.json')
-            .then(response => response.json())
-            .then(json => setBillings(json))
-            .catch(error => console.log(error));
-    }, []);
-
     const lastPostIndex = currentPage * billingsPerPage;
     const firstPostIndex = lastPostIndex - billingsPerPage;
     const currentPosts = billings.slice(firstPostIndex, lastPostIndex);
+
+    useEffect(() => {
+        if(searchResult === '') {
+            fetch('http://localhost:5000/api/billing-list')
+                .then(response => response.json())
+                .then(json => setBillings(json))
+                .catch(error => console.log(error));
+        } else {
+            fetch(`http://localhost:5000/api/search/${searchResult}`)
+                .then(response => response.json())
+                .then(json => setBillings(json))
+                .catch(error => console.log(error));
+        }
+    }, [searchResult]);
+
+    function searchFunction(event) {
+        const searchValue = event.target.value;
+        setSearchResult(searchValue);
+    }
 
     return (
         <div>
             <div className='flex flex-col lg:flex-row gap-3 w-full lg:w-4/5 mx-auto justify-between items-stretch lg:items-center p-2 m-2 bg-slate-400 rounded-md'>
                 <div className='flex gap-3 items-center justify-between'>
                     <h2 className='text-lg font-semibold'>Billings</h2>
-                    <input type="text" placeholder="Search" className="input input-bordered input-sm" />
+                    <input onKeyUp={searchFunction} type="search" placeholder="Search" className="input input-bordered input-sm" />
                 </div>
                 <div className='flex gap-3 items-center justify-between'>
                     <p className='text-lg font-semibold'>Paid Total: 0</p>
@@ -58,13 +70,16 @@ const Billings = () => {
                 </table>
             </div>
 
-
-            <Pagination
-                totalBillings={billings.length}
-                billingsPerPage={billingsPerPage}
-                setCurrentPage={setCurrentPage}
-                currentPage={currentPage}
-            />
+            <div className='flex justify-center gap-5 items-center mt-5'>
+                <button onClick={() => setCurrentPage(currentPage > 2 ? currentPage - 1 : 1)} className="btn btn-primary btn-outline btn-sm">Previous</button>
+                <Pagination
+                    totalBillings={billings.length}
+                    billingsPerPage={billingsPerPage}
+                    setCurrentPage={setCurrentPage}
+                    currentPage={currentPage}
+                />
+                <button onClick={() => setCurrentPage(currentPage < billings.length / 10 ? currentPage + 1 : currentPage)} className="btn btn-primary btn-outline btn-sm">Next</button>
+            </div>
 
 
             {/* Add New Bill Modal */}
