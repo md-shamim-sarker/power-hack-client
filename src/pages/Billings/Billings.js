@@ -1,8 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import Modal from '../../components/Modal/Modal';
+import Pagination from './Pagination';
 
 const Billings = () => {
     const [billings, setBillings] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const billingsPerPage = 10;
 
     useEffect(() => {
         fetch('./data.json')
@@ -10,6 +13,10 @@ const Billings = () => {
             .then(json => setBillings(json))
             .catch(error => console.log(error));
     }, []);
+
+    const lastPostIndex = currentPage * billingsPerPage;
+    const firstPostIndex = lastPostIndex - billingsPerPage;
+    const currentPosts = billings.slice(firstPostIndex, lastPostIndex);
 
     return (
         <div>
@@ -37,7 +44,7 @@ const Billings = () => {
                     </thead>
                     <tbody>
                         {
-                            billings.map(billing =>
+                            currentPosts.map(billing =>
                                 <tr className='hover cursor-pointer' key={billing.billing_id}>
                                     <th>{billing.billing_id}</th>
                                     <td>{billing.full_name}</td>
@@ -50,6 +57,15 @@ const Billings = () => {
                     </tbody>
                 </table>
             </div>
+
+
+            <Pagination
+                totalBillings={billings.length}
+                billingsPerPage={billingsPerPage}
+                setCurrentPage={setCurrentPage}
+                currentPage={currentPage}
+            />
+
 
             {/* Add New Bill Modal */}
             {/* <input type="checkbox" id="new-bill" className="modal-toggle" />

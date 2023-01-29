@@ -16,9 +16,9 @@ const Header = () => {
                 <NavLink to={"/billings"}>Billings</NavLink>
             </div>
             <div className='flex gap-2 items-center'>
-                <img src={user} alt="user" className='w-7 h-7' />
+                <img src={user} alt="user" className='w-6 h-6' />
                 <p className='text-lg font-semibold hidden lg:block'>Shamim Sarker</p>
-                <button className='btn btn-primary btn-sm'>Login</button>
+                <NavLink to={"/login"} className='btn btn-primary btn-sm'>Login</NavLink>
             </div>
         </div>
     );
