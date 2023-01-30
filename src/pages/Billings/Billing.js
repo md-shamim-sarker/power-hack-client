@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Billing = ({billing, setBilling, handleDelete}) => {
+const Billing = ({billing, billingInfo, handleDelete}) => {
     return (
         <>
             <tr className='hover cursor-pointer' key={billing.billing_id}>
@@ -10,7 +10,7 @@ const Billing = ({billing, setBilling, handleDelete}) => {
                 <td>{billing.phone}</td>
                 <td>{billing.paid_amount}</td>
                 <td>
-                    <label onClick={() => setBilling(billing)} htmlFor="new-bill2" className='text-blue-800 underline'>Update</label> | <span onClick={() => handleDelete(billing)} className='text-blue-800 underline'>Delete</span>
+                    <label onClick={() => billingInfo(billing)} htmlFor="new-bill2" className='text-blue-800 underline'>Update</label> | <span onClick={() => handleDelete(billing)} className='text-blue-800 underline'>Delete</span>
                 </td>
             </tr>
         </>

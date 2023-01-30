@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'react-hot-toast';
 import {NavLink, useNavigate} from 'react-router-dom';
+import Swal from 'sweetalert2';
 import power from '../../assets/power-station.png';
 import {AuthContext} from '../../contexts/UserContext';
 
@@ -22,9 +24,14 @@ const Login = () => {
                     localStorage.setItem("email", data.email);
                     setRender(!render);
                     navigate('/billings');
+                    toast('Login success!');
                 } else {
-                    localStorage.setItem("email", '');
-                    setRender(!render);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'May be wrong email or password!',
+                        footer: 'You can register a new account.'
+                    });
                 }
             })
             .catch(err => console.log(err));

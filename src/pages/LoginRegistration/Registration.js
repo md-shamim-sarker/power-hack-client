@@ -6,7 +6,11 @@ import power from '../../assets/power-station.png';
 const Registration = () => {
     const {register, handleSubmit} = useForm();
     const navigate = useNavigate();
+
+
+
     const onSubmit = user => {
+
         fetch('https://power-hack-server-three.vercel.app/api/registration', {
             method: 'POST',
             headers: {'content-type': 'application/json'},
@@ -18,6 +22,7 @@ const Registration = () => {
             console.error(error.message);
         });
     };
+
     return (
         <>
             <div className="hero min-h-screen bg-base-200">

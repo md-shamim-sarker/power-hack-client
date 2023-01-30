@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import {toast} from 'react-hot-toast';
+import Swal from 'sweetalert2';
 import Billing from './Billing';
 import Modal from './Modal';
 import Pagination from './Pagination';
@@ -11,6 +13,12 @@ const Billings = () => {
     const [searchResult, setSearchResult] = useState('');
     const billingsPerPage = 10;
     const [render, setRender] = useState(false);
+    const [modal, setModal] = useState(false);
+
+    const billingInfo = (billing) => {
+        setBilling(billing);
+        setModal(true);
+    };
 
     useEffect(() => {
         if(searchResult !== '') {
@@ -54,20 +62,38 @@ const Billings = () => {
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(billing)
         }).then((result) => {
-            console.log(result);
             setRender(!render);
+            setModal(false);
+            toast('Data updated successfully!.');
         }).catch(err => console.log(err));
     };
 
     const handleDelete = (deleteBilling) => {
-        fetch(`https://power-hack-server-three.vercel.app/api/delete-billing/${deleteBilling._id}`, {
-            method: 'DELETE'
-        })
-            .then(result => {
-                console.log(result);
-                setRender(!render);
-            })
-            .then((err) => console.log(err));
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if(result.isConfirmed) {
+                fetch(`https://power-hack-server-three.vercel.app/api/delete-billing/${deleteBilling._id}`, {
+                    method: 'DELETE'
+                })
+                    .then(result => {
+                        console.log(result);
+                        setRender(!render);
+                        Swal.fire(
+                            'Delete Successfull!',
+                            'Data has been deleted.',
+                            'success'
+                        );
+                    })
+                    .then((err) => console.log(err));
+            }
+        });
     };
 
 
@@ -80,7 +106,7 @@ const Billings = () => {
 
 
     return (
-        <div>
+        <>
             <div className='flex flex-col lg:flex-row gap-3 w-full lg:w-4/5 mx-auto justify-between items-stretch lg:items-center p-2 m-2 bg-slate-400 rounded-md'>
                 <div className='flex gap-3 items-center justify-between'>
                     <h2 className='text-lg font-semibold'>Billings</h2>
@@ -88,7 +114,7 @@ const Billings = () => {
                 </div>
                 <div className='flex gap-3 items-center justify-between'>
                     <p className='text-lg font-semibold'>Paid Total: {sum}</p>
-                    <label htmlFor="new-bill" className='btn btn-primary btn-sm'>Add New Bill</label>
+                    <label onClick={() => setModal(true)} htmlFor="new-bill" className='btn btn-primary btn-sm'>Add New Bill</label>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -111,6 +137,7 @@ const Billings = () => {
                                 billing={billing}
                                 setBilling={setBilling}
                                 handleDelete={handleDelete}
+                                billingInfo={billingInfo}
                             ></Billing>)
                         }
                         {
@@ -120,6 +147,7 @@ const Billings = () => {
                                 billing={billing}
                                 setBilling={setBilling}
                                 handleDelete={handleDelete}
+                                billingInfo={billingInfo}
                             ></Billing>)
                         }
                     </tbody>
@@ -136,37 +164,48 @@ const Billings = () => {
                 />
                 <button onClick={() => setCurrentPage(currentPage < billings.length / 10 ? currentPage + 1 : currentPage)} className="btn btn-primary btn-outline btn-sm">Next</button>
             </div>
-            <Modal
-                render={render}
-                setRender={setRender}
-            ></Modal>
 
-            <input type="checkbox" id="new-bill2" className="modal-toggle" />
-            <div className="modal">
-                <div className="modal-box relative">
-                    <h1 className="text-2xl text-center font-bold">Billing Information</h1>
-                    <label htmlFor="new-bill2" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            {
+                modal &&
+                <Modal
+                    render={render}
+                    setRender={setRender}
+                    setModal={setModal}
+                ></Modal>
+            }
 
-                    <form onSubmit={onSubmitHandler} className="card-body">
-                        <div className="form-control">
-                            <input type="text" name="full_name" className="input input-bordered" defaultValue={billing2.full_name} />
+
+            {
+                modal &&
+                <>
+                    <input type="checkbox" id="new-bill2" className="modal-toggle" />
+                    <div className="modal">
+                        <div className="modal-box relative">
+                            <h1 className="text-2xl text-center font-bold">Billing Information</h1>
+                            <label htmlFor="new-bill2" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+
+                            <form onSubmit={onSubmitHandler} className="card-body">
+                                <div className="form-control">
+                                    <input type="text" name="full_name" className="input input-bordered" defaultValue={billing2.full_name} />
+                                </div>
+                                <div className="form-control">
+                                    <input type="email" name="email" className="input input-bordered" defaultValue={billing2.email} />
+                                </div>
+                                <div className="form-control">
+                                    <input type="text" name="phone" className="input input-bordered" defaultValue={billing2.phone} />
+                                </div>
+                                <div className="form-control">
+                                    <input type="text" name="payable_amount" className="input input-bordered" defaultValue={billing2.paid_amount} />
+                                </div>
+                                <div className="form-control mt-6">
+                                    <button type='submit' className="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
                         </div>
-                        <div className="form-control">
-                            <input type="email" name="email" className="input input-bordered" defaultValue={billing2.email} />
-                        </div>
-                        <div className="form-control">
-                            <input type="text" name="phone" className="input input-bordered" defaultValue={billing2.phone} />
-                        </div>
-                        <div className="form-control">
-                            <input type="text" name="payable_amount" className="input input-bordered" defaultValue={billing2.paid_amount} />
-                        </div>
-                        <div className="form-control mt-6">
-                            <button type='submit' className="btn btn-primary">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+                    </div>
+                </>
+            }
+        </>
     );
 };
 

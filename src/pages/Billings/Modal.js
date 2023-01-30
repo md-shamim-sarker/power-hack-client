@@ -1,19 +1,28 @@
 import React from 'react';
 import {useForm} from 'react-hook-form';
+import {toast} from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
-const Modal = ({render, setRender}) => {
+const Modal = ({render, setRender, setModal}) => {
     const {register, handleSubmit} = useForm();
 
     const onSubmit = billing => {
         billing.billing_id = String(Date.now());
-        console.log(billing);
+        const phone = billing.phone;
+
+        if(phone.length !== 11) {
+            Swal.fire('Phone number should be 11 digits.');
+            return;
+        }
+
         fetch('https://power-hack-server-three.vercel.app/api/add-billing', {
             method: 'POST',
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(billing)
         }).then((result) => {
-            console.log(result);
             setRender(!render);
+            setModal(false);
+            toast('Data added successfully!.');
         }).catch(error => {
             console.error(error.message);
         });
