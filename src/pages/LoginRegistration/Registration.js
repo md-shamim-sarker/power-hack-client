@@ -7,7 +7,7 @@ const Registration = () => {
     const {register, handleSubmit} = useForm();
     const navigate = useNavigate();
     const onSubmit = user => {
-        fetch('http://localhost:5000/api/registration', {
+        fetch('https://power-hack-server-three.vercel.app/api/registration', {
             method: 'POST',
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(user)

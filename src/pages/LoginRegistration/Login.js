@@ -10,7 +10,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     const onSubmit = data => {
-        fetch('http://localhost:5000/api/login', {
+        fetch('https://power-hack-server-three.vercel.app/api/login', {
             method: 'POST',
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(data)

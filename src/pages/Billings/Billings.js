@@ -14,14 +14,14 @@ const Billings = () => {
 
     useEffect(() => {
         if(searchResult !== '') {
-            fetch(`http://localhost:5000/api/search/${searchResult}`)
+            fetch(`https://power-hack-server-three.vercel.app/api/search/${searchResult}`)
                 .then(response => response.json())
                 .then(json => setBillings(json))
                 .catch(error => console.log(error));
         }
 
         if(searchResult === '') {
-            fetch('http://localhost:5000/api/billing-list')
+            fetch('https://power-hack-server-three.vercel.app/api/billing-list')
                 .then(response => response.json())
                 .then(json => {
                     setBillings(json);
@@ -49,7 +49,7 @@ const Billings = () => {
         const paid_amount = form.payable_amount.value;
         const billing = {full_name, email, phone, paid_amount};
 
-        fetch(`http://localhost:5000/api/update-billing/${billing2._id}`, {
+        fetch(`https://power-hack-server-three.vercel.app/api/update-billing/${billing2._id}`, {
             method: 'PUT',
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(billing)
@@ -60,7 +60,7 @@ const Billings = () => {
     };
 
     const handleDelete = (deleteBilling) => {
-        fetch(`http://localhost:5000/api/delete-billing/${deleteBilling._id}`, {
+        fetch(`https://power-hack-server-three.vercel.app/api/delete-billing/${deleteBilling._id}`, {
             method: 'DELETE'
         })
             .then(result => {

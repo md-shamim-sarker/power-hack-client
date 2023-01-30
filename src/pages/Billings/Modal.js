@@ -7,7 +7,7 @@ const Modal = ({render, setRender}) => {
     const onSubmit = billing => {
         billing.billing_id = String(Date.now());
         console.log(billing);
-        fetch('http://localhost:5000/api/add-billing', {
+        fetch('https://power-hack-server-three.vercel.app/api/add-billing', {
             method: 'POST',
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(billing)
