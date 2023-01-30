@@ -1,10 +1,11 @@
 import React from 'react';
 import {useForm} from 'react-hook-form';
-import {NavLink} from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
 import power from '../../assets/power-station.png';
 
 const Registration = () => {
     const {register, handleSubmit} = useForm();
+    const navigate = useNavigate();
     const onSubmit = user => {
         fetch('http://localhost:5000/api/registration', {
             method: 'POST',
@@ -12,6 +13,7 @@ const Registration = () => {
             body: JSON.stringify(user)
         }).then((result) => {
             console.log(result);
+            navigate('/login');
         }).catch(error => {
             console.error(error.message);
         });

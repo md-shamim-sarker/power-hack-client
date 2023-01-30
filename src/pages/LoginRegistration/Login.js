@@ -1,11 +1,35 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useForm} from 'react-hook-form';
-import {NavLink} from 'react-router-dom';
+import {NavLink, useNavigate} from 'react-router-dom';
 import power from '../../assets/power-station.png';
+import {AuthContext} from '../../contexts/UserContext';
 
 const Login = () => {
+    const {render, setRender} = useContext(AuthContext);
     const {register, handleSubmit} = useForm();
-    const onSubmit = data => console.log(data);
+    const navigate = useNavigate();
+
+    const onSubmit = data => {
+        fetch('http://localhost:5000/api/login', {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(json => {
+                const user = json.status;
+                if(user === 'exist') {
+                    localStorage.setItem("email", data.email);
+                    setRender(!render);
+                    navigate('/billings');
+                } else {
+                    localStorage.setItem("email", '');
+                    setRender(!render);
+                }
+            })
+            .catch(err => console.log(err));
+    };
+
     return (
         <>
             <div className="hero min-h-screen bg-base-200">
