@@ -16,7 +16,6 @@ const Registration = () => {
             headers: {'content-type': 'application/json'},
             body: JSON.stringify(user)
         }).then((result) => {
-            console.log(result);
             navigate('/login');
         }).catch(error => {
             console.error(error.message);

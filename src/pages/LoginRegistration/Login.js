@@ -39,7 +39,11 @@ const Login = () => {
 
     return (
         <>
-            <div className="hero min-h-screen bg-base-200">
+            <div className='text-center bg-base-200 py-10'>
+                <h2 className='text-2xl font-bold'>Sample Email and Password</h2>
+                <p><span className='font-bold'>Email:</span> user@gmail.com; <span className='font-bold'>Password:</span> 123456</p>
+            </div>
+            <div className="hero bg-base-200">
                 <div className="hero-content flex-col lg:flex-row-reverse w-full lg:w-3/5">
                     <div className="text-center lg:text-left w-full lg:w-1/2">
                         <img src={power} alt="Power Station" className='w-full h-full' />

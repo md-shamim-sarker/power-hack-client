@@ -91,7 +91,7 @@ const Billings = () => {
                             'success'
                         );
                     })
-                    .then((err) => console.log(err));
+                    .then((json) => console.log(json));
             }
         });
     };
